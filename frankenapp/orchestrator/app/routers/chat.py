@@ -202,7 +202,18 @@ async def send_message(body: ChatRequest, request: Request):
     return StreamingResponse(event_stream(), media_type="text/event-stream")
 
 
-@router.get("/history/{session_id}")
+@router.post("/detect-emotion")
+async def detect_emotion(body: dict):
+    """Detect emotion from text using the CardLibrary regex patterns."""
+    from app.services.cards import CardLibrary
+
+    text = body.get("text", "")
+    card_lib = CardLibrary(settings.cards_dir)
+    emotion = card_lib.detect_emotion(text)
+    return {"emotion": emotion}
+
+
+
 async def get_history(session_id: str, request: Request):
     db_path = __import__("os").path.join(settings.state_dir, "frankenapp.db")
     try:
