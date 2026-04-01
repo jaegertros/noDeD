@@ -32,6 +32,7 @@ export class ChatSessionNode {
     this._lastResponse = "";
     this._lastEmotion = null;
     this._panel = null;
+    this._msgHandler = null;
     this._streaming = false;
 
     this.addWidget("text", "Session ID", this.properties.session_id, (val) => {
@@ -45,18 +46,33 @@ export class ChatSessionNode {
     if (!this._panel) {
       const modelConfig = this.getInputData(0);
       const cardData = this.getInputData(1);
-      this._panel = new ChatPanel(this.properties.session_id, {
-        modelConfig,
-        cardData,
+      const characters = cardData ? [cardData] : [];
+
+      this._panel = new ChatPanel(document.body, {
+        session_id: this.properties.session_id,
+        characters,
+        model_config: modelConfig,
+        user_name: this.properties.user_name,
         onClose: () => { this._panel = null; },
-        onMessage: (resp) => {
-          this._lastResponse = resp.full_response || "";
-          this._lastEmotion = resp.emotion || null;
-        },
       });
+
+      // Listen for assistant messages from this session
+      this._msgHandler = (e) => {
+        const d = e.detail;
+        if (d.sessionId !== this.properties.session_id) return;
+        if (d.role === "assistant") {
+          this._lastResponse = d.text || "";
+          this._lastEmotion = d.emotion || null;
+        }
+      };
+      window.addEventListener("chat:message", this._msgHandler);
     } else {
       this._panel.close();
       this._panel = null;
+      if (this._msgHandler) {
+        window.removeEventListener("chat:message", this._msgHandler);
+        this._msgHandler = null;
+      }
     }
   }
 
