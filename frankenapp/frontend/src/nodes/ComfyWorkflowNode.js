@@ -1,5 +1,4 @@
 import { api } from "../services/api.js";
-import { PortraitPanel } from "../panels/PortraitPanel.js";
 
 /**
  * ComfyWorkflowNode — executes a ComfyUI workflow triggered by an emotion.
@@ -33,7 +32,7 @@ export class ComfyWorkflowNode {
     this.size = [280, 200];
 
     this.addInput("trigger", "emotion");
-    this.addInput("character", "character_data");
+    this.addInput("character", "character_card");
     this.addOutput("image", "image_data");
 
     this.properties = {

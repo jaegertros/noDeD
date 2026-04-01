@@ -31,7 +31,7 @@ export class EmotionDetectorNode {
     this.color = "#BA7517";
     this.size = [200, 100];
 
-    this.addInput("text", "text");
+    this.addInput("text", "string");
     this.addOutput("emotion", "emotion");
 
     this.properties = { mode: "regex" };

@@ -69,6 +69,11 @@ export class PortraitNode {
         this.setDirtyCanvas(true);
       };
       img.src = url;
+
+      // Notify ChatPanel (and anything else) that the portrait image changed
+      window.dispatchEvent(
+        new CustomEvent("portrait:update", { detail: { url, emotion: this._emotion } })
+      );
     }
 
     // Update open panel if any

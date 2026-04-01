@@ -77,6 +77,7 @@ export class ChatPanel {
       <div class="franken-panel__header">
         <button class="franken-panel__back" title="Back to Graph (Escape)">← Graph</button>
         <div class="chat-header-info">
+          <img class="chat-portrait-thumb" src="" alt="Portrait" />
           <div class="chat-avatars">${avatarsHtml}</div>
           <span class="franken-panel__title">${sessionName}</span>
         </div>
@@ -108,6 +109,16 @@ export class ChatPanel {
     this._stopBtn = this._el.querySelector(".chat-stop-btn");
     this._contextFill = this._el.querySelector(".chat-context-bar__fill");
     this._contextLabel = this._el.querySelector(".chat-context-bar__label");
+    this._portraitThumb = this._el.querySelector(".chat-portrait-thumb");
+
+    // Keep the portrait thumbnail in sync with PortraitNode updates
+    this._portraitHandler = (e) => {
+      if (e.detail?.url) {
+        this._portraitThumb.src = e.detail.url;
+        this._portraitThumb.style.display = "";
+      }
+    };
+    window.addEventListener("portrait:update", this._portraitHandler);
 
     // Wire up button / input events
     this._el.querySelector(".franken-panel__close").addEventListener("click", () => this.close());
@@ -232,6 +243,7 @@ export class ChatPanel {
     this._el.classList.remove("visible");
     this._backdrop.classList.remove("visible");
     document.removeEventListener("keydown", this._keyHandler);
+    window.removeEventListener("portrait:update", this._portraitHandler);
 
     // Abort any in-flight stream without sending the server abort request
     if (this._abortController) {

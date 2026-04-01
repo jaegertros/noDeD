@@ -214,6 +214,7 @@ async def detect_emotion(body: dict):
 
 
 
+@router.get("/history/{session_id}")
 async def get_history(session_id: str, request: Request):
     db_path = __import__("os").path.join(settings.state_dir, "frankenapp.db")
     try:
