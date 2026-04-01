@@ -92,9 +92,19 @@ html, body {
 }
 
 .franken-panel__back {
+  background: none;
+  border: none;
   font-size: 11px;
   color: #6366f1;
   cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.franken-panel__back:hover {
+  background: #2d2d50;
 }
 
 /* Panel content area */
@@ -107,6 +117,88 @@ html, body {
 /* ==========================================================================
    Chat panel specific styles
    ========================================================================== */
+
+/* Override base panel width — right 60% of viewport */
+.chat-panel {
+  width: 60%;
+  min-width: 340px;
+}
+
+/* Semi-transparent backdrop that lets the graph show through dimly */
+.chat-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.chat-panel-backdrop.visible {
+  opacity: 1;
+}
+
+/* Header layout — avatars + title grouped together */
+.chat-header-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-avatars {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.chat-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* Context budget mini-bar in the header */
+.chat-context-bar {
+  position: relative;
+  width: 80px;
+  height: 14px;
+  background: #2a2a44;
+  border-radius: 7px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.chat-context-bar__fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: #6366f1;
+  border-radius: 7px;
+  transition: width 0.4s ease;
+}
+
+.chat-context-bar__label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: #c0c0e0;
+  white-space: nowrap;
+  pointer-events: none;
+}
 
 .chat-messages {
   display: flex;
@@ -135,6 +227,38 @@ html, body {
   background: #2a2a44;
   color: #d0d0e8;
   border-bottom-left-radius: 4px;
+}
+
+/* System messages — centered, muted */
+.chat-message--system {
+  align-self: center;
+  max-width: 70%;
+  background: transparent;
+  color: #666;
+  font-size: 11px;
+  font-style: italic;
+  text-align: center;
+  padding: 4px 8px;
+}
+
+/* Assistant message metadata row (color dot + character name) */
+.chat-message__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.chat-avatar-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.chat-message__name {
+  font-size: 11px;
+  font-weight: 600;
 }
 
 .chat-input-bar {
@@ -178,6 +302,46 @@ html, body {
 
 .chat-input-bar button:hover {
   background: #5254cc;
+}
+
+/* Button group inside the input bar */
+.chat-input-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Stop button overrides the default indigo color */
+.chat-input-bar .chat-stop-btn {
+  background: #ef4444;
+}
+
+.chat-input-bar .chat-stop-btn:hover {
+  background: #dc2626;
+}
+
+/* RP text formatting */
+.rp-action {
+  font-style: italic;
+  color: #a0c0e0;
+}
+
+.rp-speech {
+  color: #f0e0a0;
+}
+
+/* Inline error messages inside bubbles */
+.chat-error {
+  color: #ef4444;
+  font-style: italic;
+}
+
+/* Mobile — full-width panel */
+@media (max-width: 640px) {
+  .chat-panel {
+    width: 100%;
+    min-width: unset;
+  }
 }
 
 /* ==========================================================================
