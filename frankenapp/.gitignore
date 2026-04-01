@@ -1,0 +1,23 @@
+# Runtime volumes (models, outputs, state, etc.)
+volumes/models/
+volumes/comfy-models/
+volumes/comfy-output/
+volumes/state/
+volumes/cards/
+volumes/graphs/
+
+# Keep the .gitkeep
+!volumes/.gitkeep
+
+# Env file (copy from .env.example)
+.env
+
+# Node modules
+frontend/node_modules/
+frontend/dist/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
