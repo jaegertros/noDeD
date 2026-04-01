@@ -167,6 +167,16 @@ html, body {
   flex-shrink: 0;
 }
 
+.chat-portrait-thumb {
+  display: none;
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
 /* Context budget mini-bar in the header */
 .chat-context-bar {
   position: relative;
