@@ -17,8 +17,8 @@ export function registerAllNodes() {
   LiteGraph.registerNodeType("cards/CharacterCard", CharacterCardNode);
   LiteGraph.registerNodeType("chat/ChatSession", ChatSessionNode);
   LiteGraph.registerNodeType("backends/ModelBackend", ModelBackendNode);
-  LiteGraph.registerNodeType("utils/EmotionDetector", EmotionDetectorNode);
-  LiteGraph.registerNodeType("comfy/ComfyWorkflow", ComfyWorkflowNode);
-  LiteGraph.registerNodeType("ui/Portrait", PortraitNode);
+  LiteGraph.registerNodeType("pipeline/EmotionDetector", EmotionDetectorNode);
+  LiteGraph.registerNodeType("image/ComfyWorkflow", ComfyWorkflowNode);
+  LiteGraph.registerNodeType("display/Portrait", PortraitNode);
   LiteGraph.registerNodeType("world/WorldInfo", WorldInfoNode);
 }
