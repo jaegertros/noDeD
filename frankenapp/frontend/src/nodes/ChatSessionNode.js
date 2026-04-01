@@ -1,0 +1,112 @@
+import { api } from "../services/api.js";
+import { ChatPanel } from "../panels/ChatPanel.js";
+
+/**
+ * ChatSessionNode — core chat node.
+ *
+ * Inputs:
+ *   model (model_connection)  — from ModelBackend
+ *   card  (character_card)    — from CharacterCard
+ *
+ * Outputs:
+ *   response  (string)        — last assistant response
+ *   emotion   (string)        — detected emotion
+ */
+export class ChatSessionNode {
+  constructor() {
+    this.title = "Chat Session";
+    this.color = "#1a4a7a";
+    this.size = [300, 180];
+
+    this.addInput("model", "model_connection");
+    this.addInput("card", "character_card");
+
+    this.addOutput("response", "string");
+    this.addOutput("emotion", "string");
+
+    this.properties = {
+      session_id: `session_${Date.now()}`,
+      user_name: "User",
+    };
+
+    this._lastResponse = "";
+    this._lastEmotion = null;
+    this._panel = null;
+    this._streaming = false;
+
+    this.addWidget("text", "Session ID", this.properties.session_id, (val) => {
+      this.properties.session_id = val;
+    });
+    this.addWidget("button", "Open Chat", null, () => this.toggleChatPanel());
+    this.addWidget("button", "Clear History", null, () => this._clearHistory());
+  }
+
+  toggleChatPanel() {
+    if (!this._panel) {
+      const modelConfig = this.getInputData(0);
+      const cardData = this.getInputData(1);
+      this._panel = new ChatPanel(this.properties.session_id, {
+        modelConfig,
+        cardData,
+        onClose: () => { this._panel = null; },
+        onMessage: (resp) => {
+          this._lastResponse = resp.full_response || "";
+          this._lastEmotion = resp.emotion || null;
+        },
+      });
+    } else {
+      this._panel.close();
+      this._panel = null;
+    }
+  }
+
+  async _clearHistory() {
+    try {
+      await api.delete(`/api/chat/history/${this.properties.session_id}`);
+      if (this._panel) this._panel.clearMessages();
+    } catch (_) {}
+  }
+
+  onExecute() {
+    const modelConfig = this.getInputData(0);
+    const cardData = this.getInputData(1);
+
+    if (this._panel) {
+      this._panel.updateContext({ modelConfig, cardData });
+    }
+
+    this.setOutputData(0, this._lastResponse);
+    this.setOutputData(1, this._lastEmotion);
+  }
+
+  onDrawForeground(ctx) {
+    if (this._streaming) {
+      ctx.beginPath();
+      ctx.arc(this.size[0] - 16, 10, 5, 0, Math.PI * 2);
+      ctx.fillStyle = "#22c55e";
+      ctx.fill();
+    }
+    if (this._lastResponse) {
+      ctx.font = "11px sans-serif";
+      ctx.fillStyle = "#a0c0e0";
+      const preview = this._lastResponse.substring(0, 55);
+      ctx.fillText(preview + (preview.length >= 55 ? "…" : ""), 10, this.size[1] - 12);
+    }
+  }
+
+  serialize() {
+    return { properties: this.properties };
+  }
+
+  configure(data) {
+    if (data.properties) {
+      Object.assign(this.properties, data.properties);
+      if (this.widgets && this.widgets[0]) {
+        this.widgets[0].value = this.properties.session_id;
+      }
+    }
+  }
+}
+
+ChatSessionNode.title = "Chat Session";
+ChatSessionNode.desc = "Manages a conversation session";

@@ -1,0 +1,77 @@
+services:
+  koboldcpp:
+    image: koboldai/koboldcpp-cuda:latest
+    ports:
+      - "5001:5001"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - ./volumes/models:/models
+    command: >
+      --model /models/${KOBOLD_MODEL:-model.gguf}
+      --port 5001
+      --host 0.0.0.0
+      --gpulayers ${GPU_LAYERS:-99}
+      --contextsize ${CTX_SIZE:-8192}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5001/api/v1/model || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  comfyui:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
+        RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+        WORKDIR /comfyui
+        RUN git clone https://github.com/comfyanonymous/ComfyUI.git . \
+            && pip install --no-cache-dir -r requirements.txt
+        EXPOSE 8188
+        CMD ["python", "main.py", "--listen", "0.0.0.0", "--port", "8188"]
+    ports:
+      - "8188:8188"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - ./volumes/comfy-models:/comfyui/models
+      - ./volumes/comfy-output:/comfyui/output
+
+  orchestrator:
+    build: ./orchestrator
+    ports:
+      - "8000:8000"
+    depends_on:
+      koboldcpp:
+        condition: service_healthy
+      comfyui:
+        condition: service_started
+    environment:
+      KOBOLD_URL: ${KOBOLD_URL:-http://koboldcpp:5001}
+      COMFY_URL: ${COMFY_URL:-http://comfyui:8188}
+      CARDS_DIR: ${CARDS_DIR:-/cards}
+      STATE_DIR: ${STATE_DIR:-/state}
+      GRAPHS_DIR: ${GRAPHS_DIR:-/graphs}
+    volumes:
+      - ./volumes/cards:/cards
+      - ./volumes/state:/state
+      - ./volumes/graphs:/graphs
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - orchestrator
