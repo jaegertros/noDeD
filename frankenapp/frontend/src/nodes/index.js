@@ -14,7 +14,7 @@ import { PortraitNode } from "./PortraitNode.js";
 import { WorldInfoNode } from "./WorldInfoNode.js";
 
 export function registerAllNodes() {
-  LiteGraph.registerNodeType("cards/CharacterCard", CharacterCardNode);
+  LiteGraph.registerNodeType("characters/CharacterCard", CharacterCardNode);
   LiteGraph.registerNodeType("chat/ChatSession", ChatSessionNode);
   LiteGraph.registerNodeType("backends/ModelBackend", ModelBackendNode);
   LiteGraph.registerNodeType("pipeline/EmotionDetector", EmotionDetectorNode);

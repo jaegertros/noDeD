@@ -271,7 +271,9 @@ export class ChatPanel {
    */
   updateContext(ctx) {
     if (ctx.modelConfig) this.modelConfig = ctx.modelConfig;
-    if (ctx.cardData && this.characters.length === 0) {
+    if (ctx.characters) {
+      this.characters = ctx.characters;
+    } else if (ctx.cardData && this.characters.length === 0) {
       this.characters = [ctx.cardData];
     }
   }
